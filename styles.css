@@ -160,7 +160,7 @@ body {
     color: #553873;
 }
 
-.appointment.new {
+.appointment.new, .lesson.new.invalid {
     background-color: #fdec0d;
     color: #553774;
 }
