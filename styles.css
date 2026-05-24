@@ -38,6 +38,7 @@ body {
 #clock {
     color: #ffffff8a;
     text-transform: uppercase;
+	margin: 0 4px;
 }
 
 /* Content background */
