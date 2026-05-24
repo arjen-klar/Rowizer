@@ -32,7 +32,10 @@ export class ChangesUIRecord {
         //for activities use real times
         el.style.setProperty('--start-hour', this.period_start);
         el.style.setProperty('--end-hour', this.period_end);
-        if(!this.appointment.valid) {
+        if (
+            this.appointment.type === 'lesson' &&
+            (!this.appointment.valid || this.appointment.cancelled)
+        ) {
             el.classList.add('invalid');
         }
         el.setAttribute('data-appointment-id', this.appointment.id);
