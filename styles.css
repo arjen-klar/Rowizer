@@ -1,79 +1,109 @@
+html {
+    height: 100%;
+}
+
 body {
     font-family: Arial, sans-serif;
     font-weight: bold;
-    background: linear-gradient(45deg, #49a09d, #5f2c82);
+    background: linear-gradient(123deg, #719974 0%, #80a883 100%);
     height: calc(100% - 10px);
 }
-html{
-    height: 100%
-}
 
+/* Flex utilities */
 .flex {
     display: flex;
 }
 
-.flex-fill{
-    justify-content: space-around;
+.flex-fill {
+    display: flex;
+    justify-content: space-between;
+    flex-shrink: 1
 }
-#wrapper{
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Wrapper */
+#wrapper {
+    display: flex;
     flex-direction: column;
     height: 100%;
-    row-gap: 4px
+    row-gap: 4px;
 }
 
-#title,#clock {
-    color: rgb(240,240,240);
+/* Typography */
+#title,
+#clock {
+    color: #ffffff8a;
+    text-transform: uppercase;
 }
 
-.content-background{
-    background-color: rgba(255,255,255,.5)
+/* Content background */
+.content-background {
+    background-color: #fffffff5;
+    color: #553774;
 }
 
 /* Roosterwijzigingen */
-
-#content-container{
-    flex-grow:1;
-    min-height:0;
+#content-container {
+    flex-grow: 1;
+    min-height: 0;
 }
 
-.year-content-container{
+#absences-container {
+    display: none;
+}
+
+.year-content-container {
     --years-of-education: 6;
     --timeslots: 4;
 }
 
-.schedule-flex{
+.schedule-flex {
     display: flex;
     flex: 1;
 }
-.schedule-container{
+
+.schedule-container {
+    display: flex;
     flex-direction: column;
     flex-grow: 1;
-    row-gap: .5em;
+    row-gap: .3em;
 }
 
-.year-row, .schedule-content-container{
-    column-gap: 10px;
-    row-gap: .1em;
-
-}
-.year-row, .schedule-content-container, .year-header, .padding-standard{
-    padding: 3px 3px 3px 3px
+.year-row,
+.schedule-content-container {
+    column-gap: .3em;
+    row-gap: .3em;
 }
 
-.timeslot-header{
+.year-row,
+.schedule-content-container,
+.year-header,
+.padding-standard {
+    padding: 4px;
+    border-radius: 7px;
+}
+
+.timeslot-header {
     text-align: center;
+    padding: 0;
+    color: #4e7453;
 }
 
-.year-row.header{
-    max-height: 20px;
+.year-row.header {
+    max-height: 25px;
     flex-shrink: 0;
 }
 
-.year-header{
-    max-width: 15px
+.year-header {
+    max-width: 15px;
+    color: #4e7453;
 }
 
-.schedule-content-container{
+.schedule-content-container {
     display: grid;
     grid-auto-flow: row dense;
     width: 100%;
@@ -81,93 +111,99 @@ html{
     align-content: start;
 }
 
-.schedule-content{
-    overflow-y: scroll;
+.schedule-content {
+    overflow-y: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
+    color: #ffffff;
+    margin-right: -50px;
+    padding-right: 50px;
 }
+
 .year-row::-webkit-scrollbar {
     display: none;
-    width: 0px;
-    background: transparent; /* make scrollbar transparent */
+    width: 0;
+    background: transparent;
 }
 
-.year-row:not(.header){
-    min-height:50px;
+.year-row:not(.header) {
+    min-height: 50px;
 }
+
 .year-row {
-    overflow-y: overlay;
-    background-color: rgba(255,255,255,.5);
+    overflow-y: auto;
+    background-color: #ffffff61;
     flex-basis: auto;
 }
-.schedule-content{
-    margin-right: -50px; /* Maximum width of scrollbar */
-    padding-right: 50px; /* Maximum width of scrollbar */
-}
 
-
-.year-content-subcontainer{
+.year-content-subcontainer {
     margin-right: -50px;
     display: grid;
     grid-auto-flow: row dense;
     grid-column: 1 / calc(var(--timeslots) + 1);
     grid-template-columns: subgrid;
-    grid-template-rows:inherit;
-
+    grid-template-rows: inherit;
 }
 
-.appointment, .timeslot-header{
-    padding: 1px 4px 1px 4px;
-}
-.appointment{
+/* Appointments */
+.appointment {
+    padding: 5px 10px;
+    border-radius: 14px;
     grid-column-start: var(--start-hour);
     grid-column-end: calc(var(--end-hour) + 1);
-    background-color: rgba(255,255,255,.5);
+    background-color: #553675;
 }
 
-div.activity{
-    background-color: rgb(0,255,0,0.2);
-}
-div.appointment.new{
-
-    background-clip: padding-box;
-    box-shadow: inset 0 0 10px #ff0000;
+.activity {
+    background-color: #ffffff;
+    color: #553873;
 }
 
-/**afwezigen**/
+.appointment.new {
+    background-color: #fdec0d;
+    color: #553774;
+}
 
+.lesson.invalid {
+    background-color: #9f91ab;
+	color: inherit;
+}
+
+/* Afwezigen */
 .absence:not(:last-child)::after {
-    content:" - "
+    content: " - ";
 }
+
 .absence:first-child {
     margin-left: 5px;
 }
 
-#absences-container > div{
+#absences-container > div {
+    display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     row-gap: 3px;
     column-gap: 3px;
 }
 
-/** extene activiteiten **/
+/* Externe activiteiten */
 #outofoffice-inner-container {
     margin-left: 5px;
 }
-.outofoffice > div{
-    display: inline;
+
+.outofoffice > div {
+    display: inline-block;
     margin-left: 5px;
-
 }
+
 .outofoffice:not(:last-child)::after {
-    content: " || "
-                             }
+    content: " || ";
+}
+
 .outofoffice > div:not(:last-child)::after {
-    content:" /"
+    content: " /";
 }
 
-#outofoffice-container  * {
-    display: inline;
+#outofoffice-container > * {
+    display: inline-block;
 }
-
-
