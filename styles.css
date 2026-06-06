@@ -156,19 +156,25 @@ body {
 }
 
 .activity {
-    background-color: #ffffff;
+    background-color: #f1eff3;
     color: #553873;
 }
 
-.appointment.new, .lesson.new.invalid {
+.appointment.new {
     background-color: #fdec0d;
     color: #553774;
 }
 
 .lesson.invalid {
     background-color: #9f91ab;
-	color: inherit;
+    color: inherit;
 }
+
+.lesson.new.invalid {
+    background-color: #f5ee8c;
+    color: #553774;
+}
+
 
 /* Afwezigen */
 .absence:not(:last-child)::after {
