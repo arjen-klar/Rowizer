@@ -1,0 +1,218 @@
+/* Dagrooster Container */
+.dagrooster-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+    background: linear-gradient(123deg, #719974 0%, #80a883 100%);
+}
+
+/* Header Section */
+.dagrooster-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 15px;
+    text-align: center;
+}
+
+.dagrooster-group-name {
+    font-size: 4.5em;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 2px;
+}
+
+.dagrooster-date {
+    font-size: 1.8em;
+    color: #ffffff;
+    opacity: 0.95;
+    text-transform: capitalize;
+}
+
+/* Schedule Section */
+.dagrooster-schedule {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Time Row */
+.dagrooster-time-row {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.dagrooster-header-row {
+    margin-bottom: 10px;
+    border-bottom: 3px solid #553774;
+    padding-bottom: 12px;
+}
+
+.dagrooster-appointment-row {
+    flex: 1;
+    min-height: 180px;
+}
+
+/* Time Cells */
+.dagrooster-time-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    min-height: 100%;
+    position: relative;
+}
+
+.dagrooster-time-header {
+    font-weight: bold;
+    font-size: 1.3em;
+    color: #553774;
+    background-color: #e8e8e8;
+    padding: 20px 15px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Current Time Slot Highlighting */
+.dagrooster-time-cell-current {
+    background-color: #fdec0d;
+    border: 4px solid #f5d547;
+    box-shadow: 0 0 20px rgba(253, 236, 13, 0.5);
+    font-weight: bold;
+}
+
+.dagrooster-time-cell-current .dagrooster-appointment {
+    background-color: #f59e0b !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+/* Appointment */
+.dagrooster-appointment {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: #553675;
+    color: #ffffff;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(85, 54, 117, 0.3);
+    transition: all 0.3s ease;
+    word-wrap: break-word;
+    overflow: hidden;
+}
+
+.dagrooster-appointment:hover {
+    box-shadow: 0 6px 16px rgba(85, 54, 117, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Appointment Subject */
+.dagrooster-subject {
+    font-size: 1.5em;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+/* Appointment Location */
+.dagrooster-location {
+    font-size: 1.1em;
+    opacity: 0.9;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    padding-top: 8px;
+}
+
+/* Appointment Types */
+.dagrooster-activity {
+    background-color: #10b981 !important;
+}
+
+.dagrooster-activity .dagrooster-subject {
+    color: #ffffff;
+}
+
+.dagrooster-modified {
+    background-color: #f59e0b !important;
+    border: 2px solid #d97706;
+}
+
+.dagrooster-cancelled {
+    background-color: #ef4444 !important;
+    text-decoration: line-through;
+    opacity: 0.8;
+}
+
+.dagrooster-invalid {
+    background-color: #9f91ab !important;
+    opacity: 0.7;
+}
+
+/* Responsive adjustments for large displays */
+@media (min-width: 2560px) {
+    .dagrooster-group-name {
+        font-size: 6em;
+    }
+
+    .dagrooster-date {
+        font-size: 2.5em;
+    }
+
+    .dagrooster-time-header {
+        font-size: 1.8em;
+    }
+
+    .dagrooster-subject {
+        font-size: 2em;
+    }
+
+    .dagrooster-location {
+        font-size: 1.5em;
+    }
+}
+
+/* Small screens fallback */
+@media (max-width: 1200px) {
+    .dagrooster-container {
+        padding: 10px;
+    }
+
+    .dagrooster-group-name {
+        font-size: 2.5em;
+    }
+
+    .dagrooster-date {
+        font-size: 1em;
+    }
+
+    .dagrooster-schedule {
+        padding: 15px;
+        gap: 8px;
+    }
+
+    .dagrooster-time-cell {
+        padding: 8px;
+        min-height: 80px;
+    }
+
+    .dagrooster-subject {
+        font-size: 1em;
+    }
+}
