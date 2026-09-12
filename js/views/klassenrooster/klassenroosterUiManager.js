@@ -1,7 +1,8 @@
 /**
  * KlassenroosterUiManager - Manages the multi-class schedule grid view
- * Displays multiple class schedules side-by-side on a single screen (1920x1080)
- * Empty schedules are automatically hidden
+ * Displays class schedules grouped by year level (mm1, mm2, mm3, etc.)
+ * Rotates through each year group every 8 seconds
+ * Full width display optimized for 1920x1080
  */
 export class KlassenroosterUiManager {
     
@@ -9,9 +10,13 @@ export class KlassenroosterUiManager {
         this.element = element;
         this.connector = connector;
         this.dagroosterManager = dagroosterManager;
-        this.specificClasses = specificClasses; // Array of class codes to display, or null for all
+        this.specificClasses = specificClasses;
         this.groups = [];
         this.filteredGroups = [];
+        this.yearGroups = []; // Groups organized by year level
+        this.currentYearIndex = 0;
+        this.rotationInterval = null;
+        this.ROTATION_INTERVAL = 8000; // 8 seconds
     }
 
     /**
@@ -39,7 +44,18 @@ export class KlassenroosterUiManager {
             return;
         }
 
-        this.render();
+        // Organize groups by year level
+        this.organizeByYearLevel();
+
+        if (this.yearGroups.length === 0) {
+            console.warn("No year groups found");
+            this.element.innerHTML = '<p>Geen jaarniveaus gevonden</p>';
+            return;
+        }
+
+        // Start rendering with rotation
+        this.renderCurrentYearGroup();
+        this.startRotation();
     }
 
     /**
@@ -61,18 +77,90 @@ export class KlassenroosterUiManager {
     }
 
     /**
-     * Render all class schedules in a grid
+     * Organize groups by year level (mm1, mm2, mm3, etc.)
      */
-    async render() {
+    organizeByYearLevel() {
+        const yearMap = {};
+
+        // Group classes by year level
+        this.filteredGroups.forEach(group => {
+            // Extract year level (e.g., "mm1" from "mm.mm1a")
+            const match = group.extendedName.match(/([a-zA-Z]+)(\d+)/);
+            if (match) {
+                const prefix = match[1]; // 'mm'
+                const year = match[2];   // '1', '2', etc.
+                const yearKey = `${prefix}${year}`;
+
+                if (!yearMap[yearKey]) {
+                    yearMap[yearKey] = [];
+                }
+                yearMap[yearKey].push(group);
+            }
+        });
+
+        // Convert to sorted array of year groups
+        this.yearGroups = Object.keys(yearMap)
+            .sort((a, b) => {
+                // Sort naturally (mm1, mm2, mm3, ...)
+                const numA = parseInt(a.match(/\d+/)[0]);
+                const numB = parseInt(b.match(/\d+/)[0]);
+                return numA - numB;
+            })
+            .map(yearKey => ({
+                yearKey,
+                displayName: yearKey.toUpperCase(),
+                groups: yearMap[yearKey].sort((a, b) => 
+                    a.extendedName.localeCompare(b.extendedName)
+                )
+            }));
+    }
+
+    /**
+     * Render the current year group's schedules
+     */
+    async renderCurrentYearGroup() {
+        const yearGroup = this.yearGroups[this.currentYearIndex];
+        if (!yearGroup) return;
+
         this.element.innerHTML = '';
         
+        const container = document.createElement('div');
+        container.classList.add('klassenrooster-container');
+
+        // Header with year level name
+        const header = document.createElement('div');
+        header.classList.add('klassenrooster-header');
+        
+        const yearTitle = document.createElement('h1');
+        yearTitle.classList.add('klassenrooster-year-title');
+        yearTitle.textContent = yearGroup.displayName;
+        header.appendChild(yearTitle);
+
+        const dateInfo = document.createElement('p');
+        dateInfo.classList.add('klassenrooster-header-date');
+        dateInfo.textContent = this.connector.date.toLocaleString('nl-NL', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        header.appendChild(dateInfo);
+
+        const rotationInfo = document.createElement('p');
+        rotationInfo.classList.add('klassenrooster-rotation-info');
+        rotationInfo.textContent = `${this.currentYearIndex + 1} van ${this.yearGroups.length}`;
+        header.appendChild(rotationInfo);
+
+        container.appendChild(header);
+
+        // Grid of class schedules
         const gridContainer = document.createElement('div');
         gridContainer.classList.add('klassenrooster-grid');
 
-        // Load appointments for all groups and filter out empty ones
+        // Load appointments and render schedules
         const groupsWithAppointments = [];
 
-        for (const group of this.filteredGroups) {
+        for (const group of yearGroup.groups) {
             const appointments = await this.dagroosterManager.getGroupAppointments(group.id);
             
             // Only include groups that have appointments
@@ -81,7 +169,7 @@ export class KlassenroosterUiManager {
             }
         }
 
-        // Calculate optimal grid layout based on number of classes
+        // Calculate grid layout based on number of classes in this year
         const numClasses = groupsWithAppointments.length;
         const { columns } = this.calculateGridLayout(numClasses);
 
@@ -93,18 +181,21 @@ export class KlassenroosterUiManager {
             gridContainer.appendChild(classCard);
         }
 
-        this.element.appendChild(gridContainer);
+        container.appendChild(gridContainer);
+        this.element.appendChild(container);
     }
 
     /**
-     * Calculate optimal grid layout for 1920x1080 resolution
+     * Calculate optimal grid layout for 1920x1080 resolution (full width)
      */
     calculateGridLayout(numClasses) {
-        // For 1920x1080, calculate columns to fit optimally
-        if (numClasses <= 2) return { columns: 2 };
-        if (numClasses <= 4) return { columns: 2 };
+        // Optimize for full width at 1920x1080
+        if (numClasses === 1) return { columns: 1 };
+        if (numClasses === 2) return { columns: 2 };
+        if (numClasses === 3) return { columns: 3 };
+        if (numClasses === 4) return { columns: 4 };
         if (numClasses <= 6) return { columns: 3 };
-        return { columns: 3 };
+        return { columns: 4 };
     }
 
     /**
@@ -122,15 +213,6 @@ export class KlassenroosterUiManager {
         className.classList.add('klassenrooster-card-title');
         className.textContent = group.extendedName;
         header.appendChild(className);
-
-        const date = document.createElement('p');
-        date.classList.add('klassenrooster-card-date');
-        date.textContent = this.connector.date.toLocaleString('nl-NL', {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric'
-        });
-        header.appendChild(date);
 
         card.appendChild(header);
 
@@ -216,5 +298,45 @@ export class KlassenroosterUiManager {
         }
 
         return -1;
+    }
+
+    /**
+     * Start rotation between year groups
+     */
+    startRotation() {
+        this.rotationInterval = setInterval(() => {
+            this.currentYearIndex = (this.currentYearIndex + 1) % this.yearGroups.length;
+            this.renderCurrentYearGroup();
+        }, this.ROTATION_INTERVAL);
+    }
+
+    /**
+     * Stop rotation
+     */
+    stopRotation() {
+        if (this.rotationInterval) {
+            clearInterval(this.rotationInterval);
+            this.rotationInterval = null;
+        }
+    }
+
+    /**
+     * Manually navigate to a specific year group
+     */
+    goToYearGroup(index) {
+        if (index >= 0 && index < this.yearGroups.length) {
+            this.currentYearIndex = index;
+            this.renderCurrentYearGroup();
+            // Reset rotation timer
+            this.stopRotation();
+            this.startRotation();
+        }
+    }
+
+    /**
+     * Render current view (for refresh)
+     */
+    async render() {
+        await this.renderCurrentYearGroup();
     }
 }
