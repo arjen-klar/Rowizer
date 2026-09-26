@@ -7,9 +7,6 @@ export default class ChangesUIRecordClass extends ChangesUIRecord {
 
     getInnerText() {
         let str = ""
-        const subjects = Array.isArray(this.appointment.subjects) ? this.appointment.subjects : []
-        const firstSubject = typeof subjects[0] === "string" ? subjects[0] : ""
-
         if (this.entity.isMainGroup) {
             str += this.entity.name + " "
         } else {
@@ -20,15 +17,14 @@ export default class ChangesUIRecordClass extends ChangesUIRecord {
         if (!this.appointment.cancelled && this.appointment.valid) {
             //dit gaat door
             if(this.appointment.type === "activity"){
-                if (firstSubject) {
-                    str += firstSubject.replace("_", " ") + " "
-                }
+                str += this.appointment.subjects[0].replace("_", " ")
+                str += " "
 
             } else {
-                if (this.entity.isMainGroup && firstSubject) {
-                    str += firstSubject.substring(0, 6)
-                    if (subjects.length > 1) {
-                        str += "+" + (subjects.length - 1).toString()
+                if (this.entity.isMainGroup) {
+                    str += this.appointment.subjects[0].substring(0, 6)
+                    if (this.appointment.subjects.length > 1) {
+                        str += "+" + (this.appointment.subjects.length - 1).toString()
                     }
                     str += " "
                 }
@@ -41,10 +37,6 @@ export default class ChangesUIRecordClass extends ChangesUIRecord {
             }
             str += " "
 
-            if (this.appointment.locations.length) {
-                str += this.appointment.locations.sort((a,b)=>a.length-b.length)[0]
-            }
-
         } else {
             if (this.appointment.type === 'activity') {
                 str += "act vervalt"
@@ -54,5 +46,15 @@ export default class ChangesUIRecordClass extends ChangesUIRecord {
             }
         }
         return str
+    }
+
+    getLocationText() {
+        if (!this.appointment.locations.length || this.appointment.cancelled || !this.appointment.valid) {
+            return "";
+        }
+
+        return this.appointment.locations.sort((a,b)=>a.length-b.length)[0]
+            .replace(/^m(?=\d)/i, "")
+            .replace(/_/g, ".");
     }
 }

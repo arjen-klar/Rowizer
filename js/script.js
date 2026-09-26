@@ -4,6 +4,7 @@ import Absences from "./controllers/absences/absences.js";
 import {ZermeloAuthorizationError} from "./zermelo/utils/errors.js";
 import ZermeloConnector from "./connectors/zermeloConnector.js";
 import {ChangesUiManager} from "./views/changes/changesUiManager.js";
+import {TimetableUiManager} from "./views/timetable/timetableUiManager.js";
 import AbsenceEntity from "./controllers/absences/absenceEntity.js";
 import {AbsencesUiManager} from "./views/absences/absencesUiManager.js";
 import OutOfOffice from "./controllers/outofoffice/outOfOffice.js";
@@ -43,6 +44,11 @@ $(document).ready(function () {
         merge_multiple_hour_span: !(param_merge && param_merge === "false")
     });
     var changesUiManager = new ChangesUiManager(document.querySelector("#content-container"), connector, changesManager)
+    var isFullView = params.get('view') === 'full';
+    var timetableUiManager = null;
+    if(isFullView){
+        timetableUiManager = new TimetableUiManager(document.querySelector("#content-container"), connector, changesManager);
+    }
 
     var absences = new Absences(connector)
     var absencesUiManager = new AbsencesUiManager(document.querySelector("#absences-container>div"),connector,absences);
@@ -56,8 +62,9 @@ $(document).ready(function () {
 
     let dayChanged = function(){
         changesManager.reset()
-        changesUiManager.refreshTable()
-        $("#title").text("Roosterwijzigingen " + connector.date.toLocaleString("nl-NL", {
+        if(timetableUiManager) timetableUiManager.refreshTable();
+        else changesUiManager.refreshTable()
+        $("#title").text("Roosterwijzigingen - " + connector.date.toLocaleString("nl-NL", {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
@@ -68,8 +75,17 @@ $(document).ready(function () {
 
     connector.waitUntilReady().then(a=>{
         changesManager.loadData().then(cm => {
-            changesUiManager.makeTable();
-            changesUiManager.fillTable();
+            if(timetableUiManager){
+                timetableUiManager.makeTable();
+                timetableUiManager.fillTable();
+            } else {
+                changesUiManager.makeTable();
+                changesUiManager.fillTable();
+            }
+            setInterval(() => {
+                if(timetableUiManager) timetableUiManager.updateActiveTimeslot();
+                else changesUiManager.updateActiveTimeslot();
+            }, 30 * 1000);
             var last_checked_date = new Date();
             setInterval(()=> {
 
@@ -83,7 +99,7 @@ $(document).ready(function () {
                     last_checked_date = new_date;
                     connector.setDate(new_date_obk).then(a=>{
                         changesManager.reset()
-                        $("#title").text("Roosterwijzigingen " + connector.date.toLocaleString("nl-NL", {
+                        $("#title").text("Roosterwijzigingen Muurhuizen - " + connector.date.toLocaleString("nl-NL", {
                             weekday: 'long',
                             year: 'numeric',
                             month: 'long',
@@ -94,7 +110,8 @@ $(document).ready(function () {
                     })
 
                 }
-                changesUiManager.refreshTable();
+                if(timetableUiManager) timetableUiManager.refreshTable();
+                else changesUiManager.refreshTable();
 
             }, 5*60*1000)
         })
@@ -135,12 +152,14 @@ $(document).ready(function () {
     })
 
 
-    $("#title").text("Roosterwijzigingen " + changesUiManager.date.toLocaleString("nl-NL", {
+    $("#title").text("Roosterwijzigingen Muurhuizen - " + changesUiManager.date.toLocaleString("nl-NL", {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric'
     }))
+
+    
 
 
     /*$( window ).on( "resize", function() {

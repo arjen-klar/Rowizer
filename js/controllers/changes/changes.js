@@ -79,7 +79,6 @@ class Changes {
 
         let common_data = {
             branchOfSchool: this.connector.branch.id,
-            type: 'lesson',
             fields: ["id","appointmentInstance", "start", "end", "startTimeSlot", "endTimeSlot", "type", "groups", "groupsInDepartments", "locations", "cancelled", "cancelledReason", "modified", "teacherChanged", "groupChanged", "locationChanged", "timeChanged", "moved", "hidden", "changeDescription", "schedulerRemark", "lastModified", "base", "courses", "appointmentLastModified", "remark", "subjects", "teachers","valid", "students"],
             start: this.connector.date.getStartOfDayTime()/1000,
             end:this.connector.date.getEndOfDayTime()/1000
@@ -117,7 +116,7 @@ class Changes {
             //this.#combineSpansMultipleHours(modified_appointments)
         }
 
-        modified_appointments.forEach(appointment=>{
+        Object.values(modified_appointments).forEach(appointment=>{
             //bepalen of er hele afdelingen en/of jaarlagen in zitten
             //years heeft jaren als key en array met departments als value
             let years = {}
@@ -189,7 +188,7 @@ class Changes {
         })
 
         let modified_objects_object = {}
-        modified_appointments.forEach(app => modified_objects_object[app.id] = app)
+        Object.values(modified_appointments).forEach(app => modified_objects_object[app.id] = app)
 
         Object.assign(this.#appointments, modified_objects_object)
         return modified_appointments
